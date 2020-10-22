@@ -577,20 +577,53 @@ if (!empty($usemargins) && $user->rights->margins->creer)
 }
 ?>
 
+	function roundDecimal(nombre, precision){
+	var precision = precision || 2;
+	var tmp = Math.pow(10,precision);
+	return Math.round(nombre*tmp)/tmp;
+	}
+
 	/* JQuery for product free or predefined select */
 	jQuery(document).ready(function() {
+
+	jQuery("#tva_tx").change(function(event) {
+		if(jQuery("#price_ttc").val() != ''){
+			var ht = parseFloat(jQuery("#price_ht").val());
+			var tva = parseFloat(jQuery("#tva_tx").val()/100);
+			var calc_ttc = roundDecimal(parseFloat(ht + (ht*tva)),2);
+			jQuery("#price_ttc").val(calc_ttc);
+		}
+		if(jQuery("#price_ht").val() != ''){
+			var ttc = parseFloat(jQuery("#price_ttc").val());
+			var tva = parseFloat(jQuery("#tva_tx").val()/100);
+			var calc_ht = roundDecimal(parseFloat(ttc / (1+tva)),2);
+			jQuery("#price_ht").val(calc_ht);
+		}
+
+	});
+
 		jQuery("#price_ht").keyup(function(event) {
 			// console.log(event.which);		// discard event tag and arrows
 			if (event.which != 9 && (event.which < 37 ||event.which > 40) && jQuery("#price_ht").val() != '') {
-			jQuery("#price_ttc").val('');
-			jQuery("#multicurrency_subprice").val('');
+
+			var ht = parseFloat(jQuery("#price_ht").val());
+			var tva = parseFloat(jQuery("#tva_tx").val()/100);
+
+			var calc_ttc = roundDecimal(parseFloat(ht+ht*tva),2);
+			jQuery("#price_ttc").val(calc_ttc );
+			jQuery("#multicurrency_subprice").val(1);
 		}
 	});
 	jQuery("#price_ttc").keyup(function(event) {
 		// console.log(event.which);		// discard event tag and arrows
 		if (event.which != 9 && (event.which < 37 || event.which > 40) && jQuery("#price_ttc").val() != '') {
-			jQuery("#price_ht").val('');
-			jQuery("#multicurrency_subprice").val('');
+
+			var ttc = parseFloat(jQuery("#price_ttc").val());
+			var tva = parseFloat(jQuery("#tva_tx").val()/100);
+
+			var calc_ht = roundDecimal(parseFloat(ttc/(1+tva)),2);
+			jQuery("#price_ht").val(calc_ht);
+			jQuery("#multicurrency_subprice").val(1);
 		}
 	});
 	jQuery("#multicurrency_subprice").keyup(function(event) {
